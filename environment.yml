@@ -1,0 +1,14 @@
+
+name: linkedsim-alpha
+
+channels:
+    - conda-forge
+    - bioconda
+
+dependencies:
+    - numpy=1.17.3
+    - samtools=1.9
+      #- perl-vcftools-vcf=0.1.16
+    - vcftools=0.1.16
+    - nextflow=19.04.0
+
