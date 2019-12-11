@@ -134,7 +134,7 @@ process run_sim {
     
     script:
     """
-    LRTK-SIM.py $config
+    python ${baseDir}/LRTK-SIM/LRTK-SIM.py $config
     mv config/*/*fastq.gz .
     """
 }
