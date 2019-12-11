@@ -124,7 +124,7 @@ process make_config {
 }
 
 process run_sim {
-    publishDir "$outdir/sample$sample", copy: true
+    publishDir "$outdir/sample$sample", mode: 'copy'
 
     input:
     set sample, file("config"), file(hap1), file(hap2) from data_run_ch
