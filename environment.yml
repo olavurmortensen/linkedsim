@@ -11,4 +11,5 @@ dependencies:
       #- perl-vcftools-vcf=0.1.16
     - vcftools=0.1.16
     - nextflow=19.04.0
+    - gatk4=4.1.0.0
 

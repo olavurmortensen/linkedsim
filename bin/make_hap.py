@@ -39,7 +39,7 @@ def main(fasta1, fasta2):
         if iter1_empty and iter2_empty:
             break
 
-        assert header1 == header2, "Headers don't match; both input FASTAs should be sorted and have the same headers."
+        #assert header1 == header2, "Headers don't match; both input FASTAs should be sorted and have the same headers."
 
         header = header1
 

@@ -50,10 +50,9 @@ Path_Barcode_qual = file(params.Path_Barcode_qual, checkIfExists: true)
 Path_barcodepool = file(params.Path_barcodepool, checkIfExists: true)
 outdir = file(params.outdir)
 
-
 process make_small_fasta {
     output:
-    file "*.fa" into ref_fa_mutate_ch, ref_fa_hap_ch
+    file "*.fa" into ref_hap_ch, ref_hap_mutate_ch
 
     script:
     """
@@ -61,34 +60,74 @@ process make_small_fasta {
     """
 }
 
-process mutate_fasta {
+process mutate_hap {
     input:
-    file fasta from ref_fa_mutate_ch
-    
+    file ref_hap from ref_hap_mutate_ch
+
     output:
-    file "*.fa" into mutated_fa_hap_ch
+    file "*.fa" into mutated_hap_ch
     
     script:
     """
-    mutate_fasta.py $fasta $params.mutation_rate > mutated.fa
+    gatk FastaAlternateReferenceMaker -R $ref_hap -O mutated_hap.fa -L $params.region -V $vcf
     """
 }
 
+
+process single_line_ref {
+    input:
+    file fasta from ref_hap_ch
+    
+    output:
+    file "*.fa" into ref_hap_single_line_ch
+    
+    script:
+    """
+    mutate_fasta.py $fasta 0.0 > single_line.fa
+    """
+}
+
+process single_line_mutated {
+    input:
+    file fasta from mutated_hap_ch
+    
+    output:
+    file "*.fa" into mutated_hap_single_line_ch
+    
+    script:
+    """
+    mutate_fasta.py $fasta 0.0 > single_line.fa
+    """
+}
+
+//process mutate_fasta {
+//    input:
+//    file fasta from ref_fa_mutate_ch
+//    
+//    output:
+//    file "*.fa" into mutated_fa_hap_ch
+//    
+//    script:
+//    """
+//    mutate_fasta.py $fasta $params.mutation_rate > mutated.fa
+//    """
+//}
+
 sample_id_ch = Channel.from(1..params.n_samples)
 
-make_hap_data = sample_id_ch.combine(ref_fa_hap_ch).combine(mutated_fa_hap_ch)
+make_hap_data = sample_id_ch.combine(ref_hap_single_line_ch).combine(mutated_hap_single_line_ch)
 
 process make_hap {
     input:
-    set sample, file(ref_fa), file(mutated_fa) from make_hap_data
+    set sample, file("ref.fa"), file("mutated.fa") from make_hap_data
     
     output:
     set sample, file("hap1.fa"), file("hap2.fa") into fasta_hap_config_ch, fasta_hap_run_ch
     
     script:
     """
-    make_hap.py $ref_fa $mutated_fa > hap1.fa
-    make_hap.py $ref_fa $mutated_fa > hap2.fa
+    make_hap.py ref.fa mutated.fa > hap1.fa
+    make_hap.py ref.fa mutated.fa > hap2.fa
     """
 }
 
